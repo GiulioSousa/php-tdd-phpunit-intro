@@ -1,0 +1,14 @@
+<phpunit
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/|version|/phpunit.xsd"
+    colors="true">
+    <testsuites>
+        <testsuite name="leilao-test">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+
+    <logging>
+    <log type="testdox-text" target="log-tests.txt" />
+    </logging>
+</phpunit>
