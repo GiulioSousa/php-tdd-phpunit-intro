@@ -5,23 +5,30 @@ namespace Alura\Leilao\Tests\Model;
 use Alura\Leilao\Model\Lance;
 use Alura\Leilao\Model\Leilao;
 use Alura\Leilao\Model\Usuario;
+use DomainException;
 use PHPUnit\Framework\TestCase;
 
 class LeilaoTest extends TestCase
 {
     public function testLeilaoNaoDeveReceberLancesRepetidos()
     {
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('Usuário não pode efetuar 2 lances consecutivos.');
         $ana = new Usuario('Ana');
         $leilao = new Leilao('Gol');
         $leilao->recebeLance(new Lance($ana, 6000));
         $leilao->recebeLance(new Lance($ana, 7000));
         
-        static::assertCount(1, $leilao->getLances());
-        static::assertEquals(6000, $leilao->getLances()[0]->getValor());
+        /*Como a linha de código anterior lança uma exceção,
+          As linhas seguintes não serão executadas.  */
+        // static::assertCount(1, $leilao->getLances());
+        // static::assertEquals(6000, $leilao->getLances()[0]->getValor());
     }
     
     public function testLeilaoNaoDeveAceitarMaisDe5LancesPorUsuario()
     {
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('Usuário não pode efetuar mais de 5 lances por leilão.');
         $leilao = new Leilao('New Civic');
         $ana = new Usuario('Ana');
         $pedro = new Usuario('Pedro');
@@ -40,8 +47,10 @@ class LeilaoTest extends TestCase
         $leilao->recebeLance(new Lance($ana, 16000));
         $leilao->recebeLance(new Lance($pedro, 17000));
         
-        static::assertCount(10, $leilao->getLances());
-        static::assertEquals(15000, $leilao->getLances()[array_key_last($leilao->getLances())]->getValor());
+        /*Como a linha de código anterior lança uma exceção,
+          As linhas seguintes não serão executadas.  */
+        /* static::assertCount(10, $leilao->getLances());
+        static::assertEquals(15000, $leilao->getLances()[array_key_last($leilao->getLances())]->getValor()); */
     }
 
     /**

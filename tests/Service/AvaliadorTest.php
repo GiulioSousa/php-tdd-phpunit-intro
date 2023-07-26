@@ -6,16 +6,16 @@ use Alura\Leilao\Model\Lance;
 use Alura\Leilao\Model\Leilao;
 use Alura\Leilao\Model\Usuario;
 use Alura\Leilao\Service\Avaliador;
+use DomainException;
 use PHPUnit\Framework\TestCase;
 
 class AvaliadorTest extends TestCase
 {
+    /** @var Avaliador */
     private $leiloeiro;
 
-    // public function novoAvaliador()
     protected function setUp(): void
     {
-        // return new Avaliador();
         $this->leiloeiro = new Avaliador();
     }
 
@@ -27,20 +27,12 @@ class AvaliadorTest extends TestCase
     // * @dataProvider gerarLeiloes
     public function testAvaliadorMaiorValorDeLances(Leilao $leilao)
     {
-        //Arrange
-        // $leilao = $this->leilaoEmOrdemCrescente();
-
-        // $leiloeiro = new Avaliador();
-        //// $this->novoAvaliador();
-
         //Act
-        // $leiloeiro->avaliar($leilao);
         $this->leiloeiro->avaliar($leilao);
 
         $maiorValor = $this->leiloeiro->getMaiorValor();
 
         //Assert
-        // $this->assertEquals(3500, $maiorValor);
         Self::assertEquals(8000, $maiorValor);
     }
 
@@ -72,11 +64,44 @@ class AvaliadorTest extends TestCase
         $maioresLances = $this->leiloeiro->getMaioresLances();
 
         //assert
-        // Self::assertEquals(3, count($maioresLances));
         static::assertCount(3, $maioresLances);
         static::assertEquals(8000, $maioresLances[0]->getValor());
         static::assertEquals(7000, $maioresLances[1]->getValor());
         static::assertEquals(6000, $maioresLances[2]->getValor());
+    }
+
+    public function testLeilaoVazioNaoPodeSerAvaliado()
+    {
+        /* try {
+            $leilao = new Leilao('Nissan Frontier');
+            $this->leiloeiro->avaliar($leilao);
+            
+            static::fail('Exceção deveria ter sido lançada');
+        } catch (DomainException $exception) {
+            static::assertEquals(
+                'Não é possível avaliar um leilão vazio.',
+                $exception->getMessage()
+            );
+        } */
+       
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('Não é possível avaliar um leilão vazio.');
+        $leilao = new Leilao('Nissan Frontier');
+        $this->leiloeiro->avaliar($leilao);
+        
+    }
+    
+    public function testLeilaoFinalizadoNaoPodeSerAvaliado () 
+    {
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('Leilão Já foi finalizado!');
+
+        $leilao = new Leilao('Nissan Frontier');
+        $jose = new Usuario('José');
+        $leilao->recebeLance(new Lance($jose, 8000));
+        $leilao->finalizar();
+
+        $this->leiloeiro->avaliar($leilao);
     }
 
     /*-------------------DADOS------------------*/
@@ -94,9 +119,7 @@ class AvaliadorTest extends TestCase
         $leilao->recebeLance(new Lance($julia, 7000));
         $leilao->recebeLance(new Lance($jose, 8000));
 
-        // return $leilao;
         return [
-            // [$leilao]
             'ordem-crescente' => [$leilao]
         ];
     }
@@ -138,15 +161,4 @@ class AvaliadorTest extends TestCase
             'ordem-aleatoria' => [$leilao]
         ];
     }
-
-    /* public static function gerarLeiloes() 
-    {
-        $avaliadorTest = new AvaliadorTest("AvaliadorTest");
-
-        return [
-            [$avaliadorTest->leilaoEmOrdemCrescente()],
-            [$avaliadorTest->leilaoEmOrdemDecrescente()],
-            [$avaliadorTest->leilaoEmOrdemAleatoria()]
-        ];
-    } */
 }
